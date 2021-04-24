@@ -4,6 +4,8 @@ public class MenuItem {
   private String name;
   private double price;
   private String id;
+  
+  private final int idLength = 5;
 
   public MenuItem(String id, String name, double price) {
     this.name = name;
@@ -12,8 +14,8 @@ public class MenuItem {
   }
 
   public void setID(String id) {
-    if (id.length() != 5) {
-      throw new IllegalArgumentException("O identificadaor de um item do cardápio deve ter 5 caracteres.");
+    if (id.length() != idLength) {
+      throw new IllegalArgumentException("O identificadaor de um item do cardápio deve ter " + idLength + " caracteres.");
     }
 
     this.id = id.toUpperCase();

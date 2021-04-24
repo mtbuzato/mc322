@@ -19,6 +19,12 @@ public class Pidao {
   private HashMap<String, Double> discounts;
   private ArrayList<Order> orders;
 
+  private final double firstOrderDiscount = 0.2;  // Desconto na primeira compra
+  private final int ordersForDiscount = 10;       // A cada N compras, o usuário recebe um desconto. (Recorrência)
+  private final double maxDiscountForOrders = 60; // Valor máximo de desconto por recorrência de pedidos.
+  private final double valueForDiscount = 100;    // Valor mínimo para oferecer desconto por valor alto.
+  private final double discountForValue = 0.1;    // Desconto oferecido por valor alto.
+
   public Pidao(String name, String cnpj, Position pos) {
     this.name = name;
     this.cnpj = cnpj;
@@ -110,6 +116,8 @@ public class Pidao {
     if (discounts.containsKey(id)) {
       return discounts.get(id);
     }
+    
+    // IF not DISCOUNT then NORMAL PRICE
 
     return menu.get(id).getPrice();
   }
@@ -143,7 +151,7 @@ public class Pidao {
     orders.remove(order);
   }
 
-  public int getUserOrderCount(User user) {
+  private int getUserOrderCount(User user) {
     int count = 0;
 
     for (Order o : orders) {
@@ -155,7 +163,7 @@ public class Pidao {
     return count;
   }
 
-  public double calculateOrderValue(Order order) {
+  private double calculateOrderValue(Order order) {
     int orderCount = getUserOrderCount(order.getUser());
 
     System.out.printf("USUÁRIO %s FEZ %d COMPRAS.\n", order.getUser().getCPF(), orderCount);
@@ -167,12 +175,12 @@ public class Pidao {
     }
 
     if (orderCount == 0) {
-      value *= 0.8; // Desconto de 20% na primeira compra
-    } else if (orderCount % 9 == 0) {
-      double discount = Math.min(60, value);  // Desconto de 100% (limite R$60,00) a cada 10 compras
+      value *= (1 - firstOrderDiscount); // Desconto de 20% na primeira compra
+    } else if (orderCount % (ordersForDiscount - 1) == 0) {
+      double discount = Math.min(maxDiscountForOrders, value);  // Desconto de 100% (limite R$60,00) a cada 10 compras
       value -= discount;
-    } else if(value > 100) {
-      value *= 0.9; // Desconto de 10% para compras acima de R$100,00
+    } else if(value > valueForDiscount) {
+      value *= (1 - discountForValue); // Desconto de 10% para compras acima de R$100,00
     }
 
     return value;
