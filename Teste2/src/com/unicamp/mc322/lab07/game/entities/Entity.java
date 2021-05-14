@@ -7,12 +7,14 @@ public class Entity {
   private String icon;
   private String name;
   private boolean alive;
+  private double points;
 
   public Entity(String name, String icon) {
     this.name = name;
     this.icon = icon;
     this.pos = new Vector2D(0, 0);
     this.alive = true;
+    this.points = 0;
   }
 
   public void moveTo(Vector2D pos) {
@@ -37,5 +39,17 @@ public class Entity {
 
   public boolean isAlive() {
     return alive;
+  }
+
+  public double getPoints() {
+    return points;
+  }
+
+  public void addPoints(double points) {
+    this.points += points;
+  }
+
+  public void removePoints(double points) {
+    this.points -= points;
   }
 }

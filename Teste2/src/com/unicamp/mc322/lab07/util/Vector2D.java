@@ -9,6 +9,11 @@ public class Vector2D {
     this.y = y;
   }
 
+  public Vector2D(Vector2D vec) {
+    this.x = vec.getX();
+    this.y = vec.getY();
+  }
+
   public int getX() {
     return x;
   }
@@ -17,12 +22,20 @@ public class Vector2D {
     this.x = x;
   }
 
+  public void addX(int x) {
+    this.x += x;
+  }
+
   public int getY() {
     return y;
   }
 
   public void setY(int y) {
     this.y = y;
+  }
+
+  public void addY(int y) {
+    this.y += y;
   }
 
   public int distanceTo(Vector2D b) {
@@ -48,5 +61,25 @@ public class Vector2D {
   @Override
   public String toString() {
     return this.getX() + ":" + this.getY();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
+
+    Vector2D vecObj = (Vector2D) obj;
+
+    return x == vecObj.getX() && y == vecObj.getY();
+  }
+
+  @Override
+  public int hashCode() {
+    return toString().hashCode();
   }
 }

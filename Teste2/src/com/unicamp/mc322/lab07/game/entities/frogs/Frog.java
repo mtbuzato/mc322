@@ -1,32 +1,30 @@
 package com.unicamp.mc322.lab07.game.entities.frogs;
 
 import com.unicamp.mc322.lab07.game.entities.Entity;
+import com.unicamp.mc322.lab07.util.Direction;
 import com.unicamp.mc322.lab07.util.Vector2D;
 
-public class Frog extends Entity {
+public abstract class Frog extends Entity {
   private Vector2D lastPos;
-  private int points;
 
   public Frog(String name, String icon) {
     super(name, icon);
 
     this.lastPos = this.getPosition();
-    this.points = 0;
+  }
+
+  protected void setLastPosition(Vector2D pos) {
+    this.lastPos = pos;
   }
 
   public Vector2D getLastPosition() {
     return lastPos;
   }
 
-  public int getPoints() {
-    return points;
-  }
+  public abstract void move(Direction dir);
 
-  public void addPoints(int points) {
-    this.points += points;
-  }
-
-  public void removePoints(int points) {
-    this.points -= points;
-  }
+  public void eat(Entity e) {
+    addPoints(e.getPoints());
+    e.kill();
+  };
 }

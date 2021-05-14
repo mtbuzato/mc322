@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import com.unicamp.mc322.lab07.util.Vector2D;
 
-public class Obstacle {
+public abstract class Obstacle {
   private ArrayList<Vector2D> positions;
   private String icon;
 

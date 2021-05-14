@@ -51,21 +51,56 @@ public class Map {
     obstacles.add(obstacle);
   }
 
-  private ArrayList<Vector2D> getFilledPositions() {
-    ArrayList<Vector2D> filled = new ArrayList<Vector2D>();
+  public HashMap<Vector2D, Obstacle> getObstacleMatrix() {
+    HashMap<Vector2D, Obstacle> matrix = new HashMap<Vector2D, Obstacle>();
+
+    for (Obstacle obstacle : obstacles) {
+      for (Vector2D pos : obstacle.getPositions()) {
+        matrix.put(pos, obstacle);
+      }
+    }
+
+    return matrix;
+  }
+
+  public HashMap<Vector2D, Entity> getEntityMatrix() {
+    HashMap<Vector2D, Entity> matrix = new HashMap<Vector2D, Entity>();
 
     for (Entity entity : entities) {
-      filled.add(entity.getPosition());
+      matrix.put(entity.getPosition(), entity);
+    }
+
+    return matrix;
+  }
+
+  private HashMap<Vector2D, String> getIconsMatrix() {
+    HashMap<Vector2D, String> matrix = new HashMap<Vector2D, String>();
+
+    matrix.put(frog.getPosition(), frog.getIcon());
+
+    for (Entity entity : entities) {
+      matrix.put(entity.getPosition(), entity.getIcon());
     }
 
     for (Obstacle obstacle : obstacles) {
-      filled.addAll(obstacle.getPositions());
+      for (Vector2D obstaclePos : obstacle.getPositions()) {
+        matrix.put(obstaclePos, obstacle.getIcon());
+      }
     }
+
+    return matrix;
+  }
+
+  private ArrayList<Vector2D> getFilledPositions() {
+    ArrayList<Vector2D> filled = new ArrayList<Vector2D>();
+
+    filled.addAll(getObstacleMatrix().keySet());
+    filled.addAll(getEntityMatrix().keySet());
 
     return filled;
   }
 
-  private boolean isOutOfBounds(Vector2D vec) {
+  public boolean isOutOfBounds(Vector2D vec) {
     if (vec.getX() < 0 || vec.getY() < 0) {
       return true;
     }
@@ -76,24 +111,24 @@ public class Map {
 
     return false;
   }
+  
+  public void processAliveEntities() {
+    ArrayList<Entity> toRemove = new ArrayList<Entity>();
+
+    for (Entity entity : entities) {
+      if (!entity.isAlive()) {
+        toRemove.add(entity);
+      }
+    }
+
+    entities.removeAll(toRemove);
+  }
 
   public void render() {
     System.out.print("\033[H\033[2J");  
     System.out.flush();
 
-    HashMap<String, String> iconsMatrix = new HashMap<String, String>();
-
-    iconsMatrix.put(frog.getPosition().toString(), frog.getIcon());
-
-    for (Entity entity : entities) {
-      iconsMatrix.put(entity.getPosition().toString(), entity.getIcon());
-    }
-
-    for (Obstacle obstacle : obstacles) {
-      for (Vector2D obstaclePos : obstacle.getPositions()) {
-        iconsMatrix.put(obstaclePos.toString(), obstacle.getIcon());
-      }
-    }
+    HashMap<Vector2D, String> iconsMatrix = getIconsMatrix();
 
     for (int y = 0; y < height; y++) {
       for (int x = 0; x < width; x++) {
@@ -101,10 +136,10 @@ public class Map {
           System.out.print(" ");
         }
 
-        String posStr = new Vector2D(x, y).toString();
+        Vector2D pos = new Vector2D(x, y);
 
-        if (iconsMatrix.containsKey(posStr)) {
-          System.out.print(iconsMatrix.get(posStr));
+        if (iconsMatrix.containsKey(pos)) {
+          System.out.print(iconsMatrix.get(pos));
         } else {
           System.out.print(defaultIcon);
         }

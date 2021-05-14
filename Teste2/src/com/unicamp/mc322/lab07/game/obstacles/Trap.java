@@ -1,7 +1,5 @@
 package com.unicamp.mc322.lab07.game.obstacles;
 
-import java.util.ArrayList;
-
 import com.unicamp.mc322.lab07.util.Vector2D;
 
 public class Trap extends Obstacle {
