@@ -61,6 +61,10 @@ public class Deliveryman extends Person {
   }
 
   public double getStars() {
+    if (reviews.size() == 0) {
+      return 0;
+    }
+
     double stars = 0;
     
     for (Review review : reviews) {

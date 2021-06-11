@@ -4,9 +4,11 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import com.unicamp.mc322.lab10.person.Customer;
+import com.unicamp.mc322.lab10.person.Deliveryman;
 import com.unicamp.mc322.lab10.restaurant.Restaurant;
 import com.unicamp.mc322.lab10.restaurant.discount.Discount;
 import com.unicamp.mc322.lab10.restaurant.order.item.Item;
+import com.unicamp.mc322.lab10.review.Review;
 
 public class Order {
   private OrderType type;
@@ -15,6 +17,7 @@ public class Order {
   private Customer customer;
   private Restaurant restaurant;
   private double total;
+  private Deliveryman deliveryman;
 
   public Order(OrderType type, Customer customer, Restaurant restaurant) {
     this.type = type;
@@ -66,6 +69,12 @@ public class Order {
 
     switch (newState) {
       case IN_PREPARATION:
+        if (items.size() == 0) {
+          throw new IllegalStateException("Não é possível preparar um pedido sem itens.");
+        }
+
+        this.state = newState;
+
         double total = 0;
 
         for (Entry<Item, Integer> entry : items.entrySet()) {
@@ -89,14 +98,21 @@ public class Order {
         }
 
         this.total = total;
+        
         break;
       
       case READY:
+        this.state = newState;
+
         if (type.equals(OrderType.DELIVERY)) {
-          restaurant.requestDelivery(this);
+          deliveryman = restaurant.requestDelivery(this);
         }
 
+        break;
+
       default:
+        this.state = newState;
+
         break;
     }
   }
@@ -115,6 +131,69 @@ public class Order {
     }
 
     return 0.5 * restaurant.getAddress().distanceTo(customer.getAddress());
+  }
+
+  private Review createReview(int stars, String comment) {
+    if (!state.equals(OrderState.FINISHED)) {
+      throw new IllegalStateException("Não é possível avaliar esse pedido ainda.");
+    }
+
+    return new Review(stars, comment, customer);
+  }
+
+  private Review createReview(int stars) {
+    if (!state.equals(OrderState.FINISHED)) {
+      throw new IllegalStateException("Não é possível avaliar esse pedido ainda.");
+    }
+
+    return new Review(stars, customer);
+  }
+
+  public void reviewRestaurant(int stars, String comment) {
+    restaurant.receiveReview(createReview(stars, comment));
+  }
+
+  public void reviewRestaurant(int stars) {
+    restaurant.receiveReview(createReview(stars));
+  }
+
+  public void reviewItem(int stars, String comment, Item item) {
+    if (!items.containsKey(item)) {
+      throw new IllegalArgumentException("Esse item não faz parte desse pedido.");
+    }
+
+    item.receiveReview(createReview(stars, comment));
+  }
+
+  public void reviewItem(int stars, Item item) {
+    if (!items.containsKey(item)) {
+      throw new IllegalArgumentException("Esse item não faz parte desse pedido.");
+    }
+
+    item.receiveReview(createReview(stars));
+  }
+
+  public void reviewDeliveryman(int stars, String comment) {
+    if (!type.equals(OrderType.DELIVERY)) {
+      throw new IllegalStateException("Esse pedido não é para entrega.");
+    }
+
+    Review review = createReview(stars, comment);
+    
+    // Criando a review antes, nessa chamada especificamente, garante
+    // que o entregador já tenha sido atribuído
+
+    deliveryman.receiveReview(review);
+  }
+
+  public void reviewDeliveryman(int stars) {
+    if (!type.equals(OrderType.DELIVERY)) {
+      throw new IllegalStateException("Esse pedido não é para entrega.");
+    }
+
+    Review review = createReview(stars);
+
+    deliveryman.receiveReview(review);
   }
 
   public void printSummary() {

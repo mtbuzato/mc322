@@ -18,6 +18,10 @@ public enum OrderState {
   }
 
   public boolean canMoveTo(OrderState state) {
+    if (this.equals(OrderState.READY) && state.equals(OrderState.FINISHED)) { // No caso de retiradas
+      return true;
+    }
+
     return state.getOrder() - 1 == this.order;
   }
 }

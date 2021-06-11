@@ -20,6 +20,6 @@ public class Discount {
       return Math.min(amount, value);
     }
 
-    return value * (1 - (amount / 100));
+    return value * (amount / 100);
   }
 }

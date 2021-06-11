@@ -142,7 +142,7 @@ public class Restaurant {
     return null;
   }
 
-  public void requestDelivery(Order order) {
+  public Deliveryman requestDelivery(Order order) {
     if (!this.orders.contains(order)) {
       throw new IllegalArgumentException("Esse pedido não pertence a esse restaurante.");
     }
@@ -162,6 +162,8 @@ public class Restaurant {
     }
 
     deliveryman.deliver(order);
+
+    return deliveryman;
   }
 
   private Deliveryman findDeliveryman() {
@@ -179,6 +181,10 @@ public class Restaurant {
   }
 
   public double getStars() {
+    if (reviews.size() == 0) {
+      return 0;
+    }
+
     double stars = 0;
     
     for (Review review : reviews) {
@@ -214,10 +220,10 @@ public class Restaurant {
     for (Item item : menu.values()) {
       if (hasItemDiscount(item.getID())) {
         System.out.printf("[%s] %s - PROMOÇÃO!!!\n", item.getID(), item.getName());
-        System.out.printf("   De: R$.2f\n", item.getPrice());
-        System.out.printf("   Por: R$.2f\n", item.getPrice() - getItemDiscount(item.getID()).calculateDiscount(item.getPrice()));
+        System.out.printf("   De: R$%.2f\n", item.getPrice());
+        System.out.printf("   Por: R$%.2f\n", item.getPrice() - getItemDiscount(item.getID()).calculateDiscount(item.getPrice()));
       } else {
-        System.out.printf("[%s] %s - R$.2f\n", item.getID(), item.getName(), item.getPrice());
+        System.out.printf("[%s] %s - R$%.2f\n", item.getID(), item.getName(), item.getPrice());
       }
     }
 
@@ -226,13 +232,13 @@ public class Restaurant {
 
   public void printDeliverymenReviewSummary() {
     for (Deliveryman deliveryman : deliverymen) {
-      System.out.printf("   - %s: %.2f estrelas", deliveryman.getName(), deliveryman.getStars());
+      System.out.printf("   - %s: %.2f estrelas\n", deliveryman.getName(), deliveryman.getStars());
     }
   }
 
   public void printItemReviewSummary() {
     for (Item item : menu.values()) {
-      System.out.printf("   - %s: %.2f estrelas", item.getName(), item.getStars());
+      System.out.printf("   - %s: %.2f estrelas\n", item.getName(), item.getStars());
     }
   }
 }
